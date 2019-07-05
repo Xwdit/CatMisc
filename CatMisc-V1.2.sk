@@ -1,0 +1,287 @@
+#感谢您使用CatMisc,本脚本由Xwdit(Mcbbs:4522244)制作,当前版本1.2,引用或转载请标明出处!
+
+#脚本加载与卸载,以及脚本配置
+on load:
+	message "&e[Catmisc]主人,Catmisc加载成功了喵~当前版本V%{catmisc.version}%" to console #插件被加载时向控制台输出的信息
+	set {catmisc.version} to "1.2" #版本号,请勿修改
+	set {catmisc.help.enabled} to true #帮助菜单功能开关(默认开启)
+	set {catmisc.togglemodel.enabled} to true #启用游戏内的临时功能开关(默认开启)
+	set {catmisc.pvp.enabled} to true #PVP控制功能开关(默认开启)
+	set {catmisc.loresell.enabled} to true #Lore价值设定功能开关(默认开启)
+	set {catmisc.scriptblock.enabled} to true #脚本方块功能开关(默认开启)
+	set {catmisc.tpbow.enabled} to true #传送弓功能开关(默认开启)
+	set {catmisc.gravity.enabled} to true #重力控制功能开关(默认开启)
+	set {catmisc.cspeak.enabled} to true #聊天控制功能开关(默认开启)
+	set {catmisc.tpbow.item} to diamond #传送弓所需物品类型设置(默认为diamond)
+	set {catmisc.tpbow.item.name} to "钻石" #传送弓所需物品显示名称设置(默认为钻石)
+on unload:
+	message "&e[Catmisc]主人,Catmisc卸载成功了喵~" to console #插件被卸载时向控制台输出的信息
+#Catmisc帮助
+command /catmisc <number=1>:
+	usage: /catmisc [页数] - 显示CatMisc的相关帮助
+	description: 显示CatMisc的相关帮助
+	permission: catmisc.help
+	permission message: 您没有权限这么做哦.....
+	trigger:
+		if {catmisc.help.enabled} is true:
+			if argument 1 is 1:
+				message "&f===&bCatMisc 版本V1.2 by Xwdit (Mcbbs:4522244) - &a页面 1/1&f==="
+				message "&6/catmisc &f[页数] - &e显示CatMisc的相关帮助"
+				if {catmisc.togglemodel.enabled} is true:
+					message "&6/togglemodel &f<功能英文名> <true(开)/false(关)> - &e设定某功能的临时状态"
+				if {catmisc.pvp.enabled} is true:
+					message "&6/pvpcontrol &f<玩家名> <true(开)/false(关)> - &e开关某个玩家的pvp"
+					message "&6/pvp &f- &e开关自己的pvp状态"
+				if {catmisc.loresell.enabled} is true:
+					message "&6/addloreprice &f<价格> - &e设定某物品包含的Lore的右键出售价格"
+					message "&6/delloreprice &f- &e删除某物品包含的Lore的右键出售价格"
+				if {catmisc.scriptblock.enabled} is true:
+					message "&6/sbcreate &f<命令(需要包括/)> - &e向一个方块添加/修改点击触发命令"
+					message "&6/sbremove &f- &e移除一个脚本方块上的点击触发命令"
+				if {catmisc.tpbow.enabled} is true:
+					message "&6/tpbow &f<true(开)/false(关)> - &e切换传送弓开关状态"
+				if {catmisc.gravity.enabled} is true:
+					message "&6/gravity &f<玩家名> <true(开)/false(关)> - &e开关某玩家的重力状态"
+				if {catmisc.cspeak.enabled} is true:
+					message "&6/cspeak &f<玩家> <文本/指令(需要包括/)> - &e强制某玩家说话/执行指令"
+				message "&f===&a更多功能陆续添加中&f - <>为必填项,[]为可选项,()为注释==="
+			else:
+				message "&c这个页面不存在，请检查输入后重试"
+		else:
+			message "&c[CatMisc]帮助菜单显示功能已被关闭,请在脚本文件中将其启用"
+			
+#临时更改某项功能的开关状态
+command /togglemodel <text> <boolean>:
+	usage: /togglemodel <功能英文名> <true(开)/false(关)> - 设定某功能的临时状态
+	description: 设定某个功能的临时状态
+	permission: catmisc.togglemodel
+	permission message: 您没有权限这么做哦.....
+	trigger:
+		if {catmisc.togglemodel.enabled} is true:
+			if {catmisc.%argument 1%.enabled} is set:
+				set {catmisc.%argument 1%.enabled} to argument 2
+				message "&a成功将功能&6%argument 1%&a的临时开关状态变更为&6%argument 2%"
+				message "&e当前状态将保留直到下次插件被重载,之后将恢复默认设置"
+				message "&b如需变更默认设置,请编辑CatMisc脚本文件中顶端部分的&6""脚本配置""&b一栏"
+			else:
+				message "&c这个功能不存在,无法切换其状态"
+				message "&e可用的功能模块有:&fhelp(帮助菜单),togglemodel(功能临时开关),pvp(PvP控制),loresell(Lore价格设定与出售),scriptblock(脚本方块),tpbow(传送弓),gravity(重力控制),cspeak(聊天控制)"
+		else:
+			message "&c[CatMisc]功能临时开关已被禁用,请在脚本文件中将其启用"
+
+#玩家pvp状态控制
+command /pvpcontrol <player> <boolean>:
+	usage: /pvpcontrol <玩家名> <true(开)/false(关)> - 开关某个玩家的pvp
+	description: 控制某个指定玩家的pvp开关
+	permission: catmisc.pvpcontrol.other
+	permission message: 您没有权限这么做哦.....
+	trigger:
+		if {catmisc.pvp.enabled} is true:
+			set {pvpcontrol.%argument 1%} to argument 2
+			message "&a已设置玩家%argument 1%的pvp为%argument 2%"
+		else:
+			message "&c[CatMisc]Pvp控制功能已被关闭,请在脚本文件中将其启用"
+command /pvp:
+	usage: /pvp - 开关自己的pvp状态
+	description: 开关自己的pvp状态
+	executable by: player
+	permission: catmisc.pvpcontrol.self
+	permission message: 您没有权限这么做哦.....
+	cooldown: 30 seconds #在这里Pvp切换的冷却时间(默认30秒)
+	cooldown bypass: catmisc.pvpcontrol.self.bypass
+	cooldown message: 您需要等待%remaining time%才能再次切换pvp状态
+	trigger:
+		if {catmisc.pvp.enabled} is true:
+			if {pvpcontrol.%player%} is not set:
+				set {pvpcontrol.%player%} to false
+				message "&a已关闭您的pvp状态,您将无法攻击他人,也不会受到他人攻击"
+			else if {pvpcontrol.%player%} is true:
+				set {pvpcontrol.%player%} to false
+				message "&a已关闭您的pvp状态,您将无法攻击他人,也不会受到他人攻击"
+			else if {pvpcontrol.%player%} is false:
+				set {pvpcontrol.%player%} to true
+				message "&c已开启您的pvp状态,您现在可以攻击他人,也会受到他人攻击"
+		else:
+			message "&c[CatMisc]Pvp控制功能已被关闭,请在脚本文件中将其启用"
+on first join:
+	set {pvpcontrol.%event-player%} to true
+on damage of a player:
+	if attacker is player:
+		if {catmisc.pvp.enabled} is true:
+			if {pvpcontrol.%attacker%} is not set:
+				if {pvpcontrol.%victim%} is false:
+					cancel event
+					message "&e对方已关闭pvp,您无法对对方造成伤害" to attacker
+			if {pvpcontrol.%attacker%} is false:
+				if {pvpcontrol.%victim%} is not set:
+					cancel event
+					message "&e您已关闭pvp,您无法对对方造成伤害" to attacker
+			if {pvpcontrol.%attacker%} is true:
+				if {pvpcontrol.%victim%} is false:
+					cancel event
+					message "&e对方已关闭pvp,您无法对对方造成伤害" to attacker
+			if {pvpcontrol.%attacker%} is false:
+				if {pvpcontrol.%victim%} is true:
+					cancel event
+					message "&e您已关闭pvp,您无法对对方造成伤害" to attacker
+			if {pvpcontrol.%attacker%} is false:
+				if {pvpcontrol.%victim%} is false:
+					cancel event
+					message "&e双方均已关闭pvp,您无法对对方造成伤害" to attacker
+				
+#Lore价值设定与物品出售
+command /addloreprice <number>:
+	usage: /addloreprice <价格> - 设定某物品包含的Lore的右键出售价格
+	description: 以手中物品为参考,为拥有相同Lore的物品设置右键出售价格
+	executable by: player
+	permission: catmisc.loresell.add
+	permission message: 您没有权限这么做哦.....
+	trigger:
+		if {catmisc.loresell.enabled} is true:
+			set {itemsell.addingprice.status.%player%} to "add"
+			set {itemsell.addingprice.price.%player%} to argument 1
+			message "价格选定为%argument 1%游戏币,请手持并左键要将Lore设定为此价格的范例物品"
+		else:
+			message "&c[CatMisc]Lore价值设定功能已被关闭,请在脚本文件中将其启用"
+command /delloreprice:
+	usage: /delloreprice - 删除某物品的Lore的右键出售价格
+	description: 删除某物品的右键出售价格
+	executable by: player
+	permission: catmisc.loresell.del
+	permission message: 您没有权限这么做哦.....
+	trigger:
+		if {catmisc.loresell.enabled} is true:
+			set {itemsell.addingprice.status.%player%} to "del"
+			message "请手持并左键要移除Lore价格的范例物品"
+		else:
+			message "&c[CatMisc]Lore价值设定功能已被关闭,请在脚本文件中将其启用"
+on left click:
+	if {catmisc.loresell.enabled} is true:
+		if {itemsell.addingprice.status.%event-player%} is "add":
+			if lore of event-item is not set:
+				message "这个物品上没有检测到Lore信息!"
+				delete {itemsell.addingprice.price.%event-player%}
+				delete {itemsell.addingprice.status.%event-player%}
+			else:
+				add "%lore of event-item%" to {itemsell.item::*}
+				set {itemsell.price.%lore of event-item%} to {itemsell.addingprice.price.%event-player%}
+				message "成功以手中物品为参考,为拥有相同Lore的物品将出售价格设置为%{itemsell.addingprice.price.%event-player%}%"
+				delete {itemsell.addingprice.price.%event-player%}
+				delete {itemsell.addingprice.status.%event-player%}
+		else if {itemsell.addingprice.status.%event-player%} is "del":
+			if lore of event-item is not set:
+				message "这个物品上没有检测到Lore信息!"
+				delete {itemsell.addingprice.status.%event-player%}
+			else:
+				remove "%lore of event-item%" from {itemsell.item::*}
+				delete {itemsell.price.%lore of event-item%}
+				message "已成功移除了这个物品包含的Lore的出售价格"
+				delete {itemsell.addingprice.status.%event-player%}
+on right click:
+	if {catmisc.loresell.enabled} is true:
+		loop {itemsell.item::*}:
+			if loop-value is "%lore of event-item%":
+				cancel event
+				remove 1 from item amount of event-item
+				add {itemsell.price.%loop-value%} to the event-player's account
+				message "物品出售成功,您已获得%{itemsell.price.%loop-value%}%游戏币" to event-player
+				stop trigger
+			
+#点击式单命令脚本方块
+command /sbcreate <text>:
+	executable by: player
+	usage: /sbcreate <命令(需要包括/)> - 向一个方块添加/修改点击触发命令
+	description: 向一个方块添加/修改命令
+	permission: catmisc.scriptblock.create
+	permission message: 你没有权限这么做哦.....
+	trigger:
+		if {catmisc.scriptblock.enabled} is true:
+			if argument 1 contains "/":
+				set {scriptblock.create.%player%} to "add"
+				set {scriptblock.command.%player%} to argument 1
+				message "设定的命令是%argument 1%,请右键一个方块来添加/修改命令"
+			else:
+				message "&c命令格式不正确,命令应以""/""开头"
+		else:
+			message "&c[CatMisc]脚本方块功能已被关闭,请在脚本文件中将其启用"
+command /sbremove:
+	executable by: player
+	usage: /sbremove - 移除一个脚本方块上的点击触发命令
+	description: 移除一个脚本方块上的命令
+	permission: catmisc.scriptblock.remove
+	permission message: 你没有权限这么做哦....
+	trigger:
+		if {catmisc.scriptblock.enabled} is true:
+			set {scriptblock.create.%player%} to "del"
+			message "请右键一个方块来移除上面的命令"
+		else:
+			message "&c[CatMisc]脚本方块功能已被关闭,请在脚本文件中将其启用"
+on rightclick:
+	if {catmisc.scriptblock.enabled} is true:
+		if clicked block is set:
+			if {scriptblock.create.%event-player%} is "add":
+				set {scriptblock.save.%location of event-block%.%world of event-block%} to {scriptblock.command.%event-player%}
+				message "已将命令%{scriptblock.command.%event-player%}%添加至方块%location of event-block%在世界%world of event-block%"
+				delete {scriptblock.command.%event-player%}
+				delete {scriptblock.create.%event-player%}
+			else if {scriptblock.create.%event-player%} is "del":
+				if {scriptblock.save.%location of event-block%.%world of event-block%} is set:
+					delete {scriptblock.save.%location of event-block%.%world of event-block%}
+					message "已从方块%location of event-block%(世界:%world of event-block%)移除指令"
+					delete {scriptblock.create.%event-player%}
+				else:
+					message "这个方块上没有已绑定的点击触发指令"
+					delete {scriptblock.create.%event-player%}
+			else:
+				make event-player execute command {scriptblock.save.%location of event-block%.%world of event-block%}
+
+#传送弓(消耗钻石)			
+command /tpbow <boolean>:
+	executable by: player
+	usage: /tpbow <true(开)/false(关)> - 切换传送弓的状态
+	description: 切换传送弓的状态
+	permission: catmisc.tpbow
+	permission message: 您没有权限这么做哦...
+	trigger:
+		if {catmisc.tpbow.enabled} is true:
+			if player's off hand item is {catmisc.tpbow.item}:
+				set {tpbow.%player%} to argument 1
+				message "成功将传送弓状态设置为%argument 1%,每次射击会消耗1个%{catmisc.tpbow.item.name}%" to player
+			else:
+				message "请先在左手(副手)放上%{catmisc.tpbow.item.name}%再启用" to player
+		else:
+			message "&c[CatMisc]传送弓功能已被关闭,请在脚本文件中将其启用"
+on projectile hit:
+	if {catmisc.tpbow.enabled} is true:
+		{tpbow.%shooter%} is true
+		hotbar slot of shooter is bow
+		shooter is player
+		shooter's off hand item is {catmisc.tpbow.item}
+		remove 1 from item amount of shooter's off hand item
+		teleport shooter to event-projectile
+
+#开关玩家重力
+command /gravity <player> <boolean>:
+	permission: catmisc.gravity
+	permission message: 您没有权限这么做哦...
+	usage: /gravity <玩家名> <true(开)/false(关)> - 开关某玩家的重力状态
+	description: 开关某玩家的重力状态
+	trigger:
+		if {catmisc.gravity.enabled} is true:
+			set gravity of argument 1 to argument 2
+			message "成功将%argument 1%的重力设置为%argument 2%"
+		else:
+			message "&c[CatMisc]重力控制功能已被关闭,请在脚本文件中将其启用"
+
+#强制某玩家说话/执行指令
+command /cspeak <player> <text>:
+	permission: catmisc.cspeak
+	permission message: 您没有权限这么做哦...
+	usage: /cspeak <玩家> <文本/指令(需要包括/)> - 强制某玩家说话/执行指令
+	description: 强制某玩家说话/执行指令
+	trigger:
+		if {catmisc.cspeak.enabled} is true:
+			make the argument 1 say argument 2
+		else:
+			message "&c[CatMisc]聊天控制功能已被关闭,请在脚本文件中将其启用"
+		
