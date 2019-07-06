@@ -2,7 +2,7 @@
 
 #脚本加载与卸载,以及脚本配置
 on load:
-	message "&e[Catmisc]主人,Catmisc加载成功了喵~当前版本V%{catmisc.version}%" to console #插件被加载时向控制台输出的信息
+	message "&e[Catmisc] 主人,Catmisc加载成功了喵~当前版本V%{catmisc.version}%" to console #插件被加载时向控制台输出的信息
 	set {catmisc.version} to "1.2" #版本号,请勿修改
 	set {catmisc.help.enabled} to true #帮助菜单功能开关(默认开启)
 	set {catmisc.togglemodel.enabled} to true #启用游戏内的临时功能开关(默认开启)
@@ -15,7 +15,7 @@ on load:
 	set {catmisc.tpbow.item} to diamond #传送弓所需物品类型设置(默认为diamond)
 	set {catmisc.tpbow.item.name} to "钻石" #传送弓所需物品显示名称设置(默认为钻石)
 on unload:
-	message "&e[Catmisc]主人,Catmisc卸载成功了喵~" to console #插件被卸载时向控制台输出的信息
+	message "&e[Catmisc] 主人,Catmisc卸载成功了喵~" to console #插件被卸载时向控制台输出的信息
 #Catmisc帮助
 command /catmisc <number=1>:
 	usage: /catmisc [页数] - 显示CatMisc的相关帮助
